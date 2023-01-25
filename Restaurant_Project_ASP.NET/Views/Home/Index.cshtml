@@ -7,31 +7,87 @@
 <script src="~/Scripts/jquery-3.6.3.min.js"></script>
 
 <script type="text/javascript">
-$(document).ready(function () {
+    $(document).ready(function () {
+        $("#Item").val(0);
+        $("#Item").change(function () {
+            var itemId = $("#Item").val();
+            GetItemUnitPrice(itemId);
+        });
 
-    $("#Item").change(function () {
-        var itemId = $("#Item").val();
-        GetItemUnitPrice(itemId);
+        $("input[type=text]").change(function () {
+            CalculateSubTotal();
+        });
+
+        $("#btnAddToList").click(function() {
+            AddToTheItemList()
+        });
+
     });
 
-    });
+    function AddToTheItemList() {
+        var tblItemList = $("#tblRestaurantItemList");
+        var UnitPrice = $("#txtUnitPrice").val();
+        var Quantity = $("#txtQuantity").val();
+        var Discount = $("#txtDiscount").val();
+        var ItemId = $("#Item").val();
+        var ItemName = $("#Item option:selected").text();
+        var Total = (UnitPrice * Quantity) - Discount;
+
+        var ItemList = "<tr></td hidden>" +
+            ItemId +
+            "</td><td>" +
+            ItemName +
+            "</td><td>" +
+            parseFloat(UnitPrice).toFixed(2) +
+            "<td><td>" +
+            parseFloat(Quantity).toFixed(2) +
+            "</td><td>" +
+            parseFloat(Discount).toFixed(2) + 
+            "</td><td>" +
+            parseFloat(Total).toFixed(2) +
+            "</td><td><input type='button' name='remove' value='Remove' class='btn btn-danger' onclick='RemoveItem(this)'/> </tr></tr>";
+
+        tblItemList.append(ItemList);
+        ResetItem();
+    }
+
+    function ResetItem() {
+        $("#txtUnitPrice").val('');
+        $("#txtQuantity").val('');
+        $("#txtDiscount").val('');
+        $("#Item").val(0);
+        $("#txtTotal").val("");
+    }
+
+
+    function CalculateSubTotal() {
+
+        var UnitPrice = $("#txtUnitPrice").val();
+        var Quantity = $("#txtQuantity").val();
+        var Discount = $("#txtDiscount").val();
+
+        var Total = (UnitPrice * Quantity) - Discount;
+
+        $("#txtTotal").val(parseFloat(Total).toFixed(2));
+    }
+
 
     function GetItemUnitPrice(itemId) {
-    $.ajax({
-        asysnc: true,
-        type: 'GET',
-        dataType: 'JSON',
-        contentType: 'application/json; charset=utf-8',
-        data: { itemId: itemId },
-        url: '/home/getItemUnitPrice',
-        success: function (data) {
-            $('#txtUnitPrice').val(parseFloat(data).toFixed(2));
-        },
-        error: function () {
-            alert("There is some problem to get the Unit Price.");
-        }
-    });
-}
+        $.ajax({
+            asysnc: true,
+            type: 'GET',
+            dataType: 'JSON',
+            contentType: 'application/json; charset=utf-8',
+            data: { itemId: itemId },
+            url: '/home/getItemUnitPrice',
+            success: function (data) {
+                $('#txtUnitPrice').val(parseFloat(data).toFixed(2));
+            },
+            error: function () {
+                alert("There is some problem to get the Unit Price.");
+            }
+        });
+    }
 
 </script>
 
@@ -150,7 +206,7 @@ $(document).ready(function () {
         Restaurant Listed Items
     </legend>
 
-    <table style="width:100%">
+    <table style="width:100%" id="tblRestaurantItemList">
         <thead>
             <tr>
                 <th hidden>Item Id</th>
@@ -166,29 +222,27 @@ $(document).ready(function () {
 
 </fieldset>
 
-<fieldset>
-    <legend>
-        Restaurant Items
-    </legend>
+@*<fieldset>
+        <legend>
+            Restaurant Items
+        </legend>
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group">
-                    Item :
-                    @Html.DropDownList("Item", new SelectList(Model.Item2, dataValueField: "Value", dataTextField: "Text"),
-                   new { @class = "form-control" })
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        Item :
+                        @Html.DropDownList("Item", new SelectList(Model.Item2, dataValueField: "Value", dataTextField: "Text"),
+                       new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        Unit Price:
+                        <input type="text" name="UnitPrice" class="form-control" value="0.00" readonly="readonly" id="txtUnitPrice" />
+                    </div>
                 </div>
             </div>
-
-            <div class="col-md-6">
-                <div class="form-group">
-                    Unit Price:
-                    <input type="text" name="UnitPrice" class="form-control" value="0.00" readonly="readonly" id="txtUnitPrice"/>
-                </div>
-            </div>
-
         </div>
-    </div>
-
-</fieldset>
+    </fieldset>*@
