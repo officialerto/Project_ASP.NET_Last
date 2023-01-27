@@ -18,11 +18,15 @@
             CalculateSubTotal();
         });
 
-        $("#btnAddToList").click(function() {
+        $("#btnAddToList").click(function () {
             AddToTheItemList()
         });
 
     });
+
+    function RemoveItem(itemId) {
+        $(itemId).closest('tr').remove();
+    }
 
     function AddToTheItemList() {
         var tblItemList = $("#tblRestaurantItemList");
@@ -39,22 +43,35 @@
             ItemName +
             "</td><td>" +
             parseFloat(UnitPrice).toFixed(2) +
-            "<td><td>" +
+            "</td><td>" +
             parseFloat(Quantity).toFixed(2) +
             "</td><td>" +
-            parseFloat(Discount).toFixed(2) + 
+            parseFloat(Discount).toFixed(2) +
             "</td><td>" +
             parseFloat(Total).toFixed(2) +
-            "</td><td><input type='button' name='remove' value='Remove' class='btn btn-danger' onclick='RemoveItem(this)'/> </tr></tr>";
+            "</td><td> <input type='button' name='remove' value='Remove' class='btn btn-danger' onclick='RemoveItem(this)'/> </tr></tr>";
 
         tblItemList.append(ItemList);
+        FinalItemTotal();
         ResetItem();
+    }
+
+    function FinalItemTotal() {
+        $("#txtFinalTotal").val("0.00");
+        var FinalTotal = 0.00;
+        $("#tblRestaurantItemList").find("tr:gt(0)").each(function(){
+            var Total = parseFloat($(this).find("td:eq(5)").text());
+            FinalTotal = FinalTotal + Total;
+            alert(FinalTotal);
+        });
+
+        $("#txtFinalTotal").val(parseFloat(FinalTotal).toFixed(2));
     }
 
     function ResetItem() {
         $("#txtUnitPrice").val('');
         $("#txtQuantity").val('');
-        $("#txtDiscount").val('');
+        $("#txtDiscount").val('0.00');
         $("#Item").val(0);
         $("#txtTotal").val("");
     }
@@ -122,7 +139,7 @@
 
     <div class="container">
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     Customer :
                     @Html.DropDownList("Customer", new SelectList(Model.Item1, dataValueField: "Value", dataTextField: "Text"),
@@ -130,13 +147,22 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     Payment Type :
                     @Html.DropDownList("PaymentType", new SelectList(Model.Item3, dataValueField: "Value", dataTextField: "Text"),
                    new { @class = "form-control" })
                 </div>
             </div>
+
+            <div class="col-md-4">
+                <div class="form-group">
+                    Total :
+                    <input style="text-align:right; font-weight:bold" name="FinalTotal" type="text" readonly="readonly" id="txtFinalTotal"
+                           class="form-control" />
+                </div>
+            </div>
+
         </div>
         <br />
     </div>
@@ -200,7 +226,9 @@
         <br />
     </div>
 </fieldset>
+
 <br />
+
 <fieldset>
     <legend>
         Restaurant Listed Items
